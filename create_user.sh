@@ -43,3 +43,20 @@ chmod 600 "$USER_HOME/.ssh/authorized_keys"
 chown -R "$USERNAME:$USERNAME" "$USER_HOME/.ssh"
 
 echo "Done. '$USERNAME' has passwordless sudo and SSH key access."
+
+# Generate the user's own SSH keypair
+USER_KEY="$USER_HOME/.ssh/id_ed25519"
+if [[ -f "$USER_KEY" ]]; then
+    echo "Keypair already exists at $USER_KEY, skipping generation."
+else
+    sudo -u "$USERNAME" ssh-keygen -t ed25519 -N "" -f "$USER_KEY" -C "$USERNAME@$(hostname)"
+    echo "Generated keypair for '$USERNAME'."
+fi
+
+chmod 600 "$USER_KEY"
+chmod 644 "$USER_KEY.pub"
+chown "$USERNAME:$USERNAME" "$USER_KEY" "$USER_KEY.pub"
+
+echo "----- $USERNAME public key -----"
+cat "$USER_KEY.pub"
+echo "--------------------------------"
