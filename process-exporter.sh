@@ -63,8 +63,13 @@ echo "Creating config file at ${PROCESS_EXPORTER_CONFIG}..."
 mkdir -p "$(dirname "${PROCESS_EXPORTER_CONFIG}")"
 cat > "${PROCESS_EXPORTER_CONFIG}" <<'EOF'
 process_names:
-  - name: "{{.Comm}}"
+  # Process thường — gom theo tên binary đầy đủ
+  - name: "{{.ExeBase}}"
     cmdline:
+      - '.+'
+  # Fallback: kernel threads / process không đọc được exe
+  - name: "{{.Comm}}"
+    comm:
       - '.+'
 EOF
 chown -R "${PROCESS_EXPORTER_USER}:${PROCESS_EXPORTER_USER}" "$(dirname "${PROCESS_EXPORTER_CONFIG}")"
